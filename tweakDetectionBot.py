@@ -1,9 +1,20 @@
 import requests
 import feedparser
 import praw
+from bs4 import BeautifulSoup
+
 r = praw.Reddit('/r/jailbreak package description bot')
 r.login("username","password")
-            
+
+def checkType(link):
+    response = requests.post(link)
+    soup = BeautifulSoup(response.text)
+    tag= soup.find(id="section")
+    type = str(tag.string)
+    if type == "Tweaks":
+        return True
+    else:
+        return False
 def checkTweak(packageName):        
     response = requests.post("http://planet-iphones.com/cydia/feed/name/" + packageName)
     feed = feedparser.parse( response.text )
@@ -23,7 +34,8 @@ def getTweak(packageName):
             link = str(item[ "link" ])
             descrip = str(item[ "description" ])
             link = "http://cydia.saurik.com/package/" + link.replace("http://planet-iphones.com/cydia/id/", "")
-            return link, descrip
+            if checkType(link):
+                return link, descrip
 while True:
     subreddit = r.get_subreddit('jailbreak')
     for submission in subreddit.get_new(limit=25):
