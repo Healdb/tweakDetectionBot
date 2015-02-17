@@ -22,8 +22,7 @@ def checkTweak(packageName):
         title = item[ "title" ]
         if title.lower() == packageName:
             return True
-        else:
-            return False
+    return False
     
 def getTweak(packageName):        
     response = requests.post("http://planet-iphones.com/cydia/feed/name/" + packageName)
