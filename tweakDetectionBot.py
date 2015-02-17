@@ -20,9 +20,10 @@ def getTweak(packageName):
     for item in feed[ "items" ]:
         title = item[ "title" ]
         if title.lower() == packageName:
-            link = item[ "link" ]
-            descrip = item[ "description" ]
-            return str(link), str(descrip)
+            link = str(item[ "link" ])
+            descrip = str(item[ "description" ])
+            link = "http://cydia.saurik.com/package/" + link.replace("http://planet-iphones.com/cydia/id/", "")
+            return link, descrip
 while True:
     subreddit = r.get_subreddit('jailbreak')
     for submission in subreddit.get_new(limit=25):
