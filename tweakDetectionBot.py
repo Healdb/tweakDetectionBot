@@ -38,6 +38,9 @@ def getTweak(packageName):
             descrip = str(item[ "description" ])
             link = "http://cydia.saurik.com/package/" + link.replace("http://planet-iphones.com/cydia/id/", "")
             if checkType(link):
+                response = requests.post(link)
+                soup = BeautifulSoup(response.text)
+                link= soup.iframe['src']
                 return link, descrip
             
 while True:
