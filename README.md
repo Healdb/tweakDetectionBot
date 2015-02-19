@@ -5,3 +5,9 @@ Crawls /r/jailbreak and provides a link and description of any tweaks it may fin
 PRAW
 
 feedparser
+
+
+pyenchant
+
+
+BS4
