@@ -5,7 +5,7 @@ Provides a link and a description for a specific tweak when summoned.
 
 On /r/Jailbreak, comment anywhere saying -
 
-<p>"+/u/<botusername> <tweak>"</p>
+<p>"+/u/botusername tweak"</p>
 
 
 <h3>Requirements:</h3>
