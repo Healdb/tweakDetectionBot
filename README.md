@@ -1,5 +1,11 @@
 # tweakDetectionBot
-Crawls /r/jailbreak and provides a link and description of any tweaks it may find in the title.
+Provides a link and a description for a specific tweak when summoned.
+
+<h3>Usage:</h3
+On /r/Jailbreak, comment anywhere saying -
+
++/u/<botusername> <tweak>
+
 
 <h3>Requirements:</h3>
 PRAW
