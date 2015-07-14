@@ -5,24 +5,24 @@ import praw
 from bs4 import BeautifulSoup
 import re
 import traceback
+
 r = praw.Reddit('/r/jailbreak package description provider')
 username="USERNAME"
 password="PASSWORD"
 #I think that this authentication method is being depreciated, it'll probably have to be changed soon
 r.login(username,password)
+botName=username
 
 def findTitle(txt):
     txt=txt.replace("+/u/","")
-    re1='^'+username+' (.*)'
+    re1=''+botName+'\s\[(.*)\]'
     rg = re.compile(re1,re.IGNORECASE|re.DOTALL)
     m = rg.search(txt)
     if m:
         word1=m.group(1)
+        print word1
         return word1
-    else:
-        return "ERROR"
 def checkType(link):
-    print link
     response = requests.post(link)
     soup = BeautifulSoup(response.text)
     tag= soup.find(id="section")
@@ -30,7 +30,7 @@ def checkType(link):
         type = str(tag.string)
     except:
         return False
-    if type == "Tweaks":
+    if type == "Tweaks" or type=="Addons":
         return True
     return False
 def getTweak(packageName):
@@ -42,7 +42,9 @@ def getTweak(packageName):
         title = item[ "title" ]
         if title.lower() == packageName:
             link = str(item[ "link" ])
-            descrip = str(item[ "description" ])
+            response = requests.post(link)
+            soup = BeautifulSoup(response.text)
+            descrip= soup.find("div", { "class" : "package_description" }).text
             link = "http://cydia.saurik.com/package/" + link.replace("http://planet-iphones.com/cydia/id/", "")
             if checkType(link):
                 response = requests.post(link)
@@ -52,14 +54,29 @@ def getTweak(packageName):
                 print descrip
                 return link, descrip
             else:
-                "bad type"
+                print "bad type"
         else:
             print "bad title"
+    return False,"error"
+def assembleSuggestions(packageName):
+    testName = packageName.replace(" ","+")
+    link = "http://planet-iphones.com/cydia/feed/name/" + testName
+    response = requests.post(link)
+    feed = feedparser.parse( response.text )
+    c=0
+    text="Tweak not found! Did you mean...\n\n "
+    for item in feed[ "items" ]:
+        if c>3:
+            break
+        title = item[ "title" ]
+        text = text + "* "+title.lower()+"\n\n "
+        c+=1
+    return text
 while True:
     print "checking"
     messages = r.get_unread('mentions')
     for message in messages:
-        obj = open('seen_posts.txt', 'ab+')
+        print message.body
         try:
             submission= message.submission
             title = submission.title
@@ -68,25 +85,24 @@ while True:
             else:
                 jailbreak=False
         except:
+            print traceback.format_exc()
             jailbreak=False
-        if message.id not in open("seen_posts.txt").read() and jailbreak:
+        if jailbreak:
             print "checking name.."
             text = message.body
             words = findTitle(text)
-            try:
-                link, descrip = getTweak(words.lower())
-                message.reply("The following is short description and link to the tweak: \n\n Title: [" + words +"](" + link + ") \n\nDescription: " + descrip + " \n\nCreated by healdb. This bot uses http://planet-iphones.com to find its information, and therefore makes no guarantees on it's accuracy")
-                print "Found post and commented, link: " + submission.permalink
-            except:
+            link, descrip = getTweak(words.lower())
+            if link==False:
                 print traceback.format_exc()
                 print "\n\n"
-                print "Tweak not found " + str(words)
+                print "tweak not found " + str(words)
+                text = assembleSuggestions(words)
+                message.reply(text)
+            else:
+                message.reply("The following is short description and link for the tweak you requested: \n\n Title: [" + words +"](" + link + ") \n\nDescription: " + descrip + " \n\nCreated by healdb. This bot uses http://planet-iphones.com to find its information, and therefore makes no guarantees on it's accuracy.")
+                print "Found post and commented, link: " + submission.permalink
         else:
-            if message.id in open("seen_posts.txt").read():
-                print "Already seen"
-            print "Does not meet qualifications"
+            print "not met"
         message.mark_as_read()
-        obj.write(message.id)
-        obj.close()
-    print "Check done"
+    print "check done"
     time.sleep(5)
