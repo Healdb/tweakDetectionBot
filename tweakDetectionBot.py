@@ -125,21 +125,21 @@ while True:
                 words = assembleSuggestions(words)
                 link, descrip,typet= getTweak(words.lower())
                 try:
-                    text = "Tweak not found, the following is the closest match: \n\n Title: [" + words +"](" + link + ")\n\nCategory: "+str(typet)+" \n\nDescription: " + descrip + " \n\nCreated by healdb. This bot uses http://planet-iphones.com to find its information, and therefore makes no guarantees on it's accuracy."
+                    text = "Tweak not found, the following is the closest match: \n\n Title: [" + words +"](" + link + ")\n\nCategory: "+str(typet)+" \n\nDescription: " + descrip + " \n\nCreated by healdb. This bot uses http://planet-iphones.com to find its information, and therefore makes no guarantees on its accuracy."
                     message.reply(text)
                     print "Close Match"
                 except:
                     try:
                         words=checkSpaces(permWords.lower())
                         link, descrip,typet= getTweak(words.lower())
-                        text = "Tweak not found, the following is the closest match: \n\n Title: [" + words +"](" + link + ")\n\nCategory: "+str(typet)+" \n\nDescription: " + descrip + " \n\nCreated by healdb. This bot uses http://planet-iphones.com to find its information, and therefore makes no guarantees on it's accuracy."
+                        text = "Tweak not found, the following is the closest match: \n\n Title: [" + words +"](" + link + ")\n\nCategory: "+str(typet)+" \n\nDescription: " + descrip + " \n\nCreated by healdb. This bot uses http://planet-iphones.com to find its information, and therefore makes no guarantees on its accuracy."
                         message.reply(text)
                         print "Close Match"
                     except:
                         print "No Match"
-                        message.reply("Tweak not found, and there are no close matches. You may have spelled the name incorrectly. \n\nCreated by healdb. This bot uses http://planet-iphones.com to find its information, and therefore makes no guarantees on it's accuracy.")
+                        message.reply("Tweak not found, and there are no close matches. You may have spelled the name incorrectly. \n\nCreated by healdb. This bot uses http://planet-iphones.com to find its information, and therefore makes no guarantees on its accuracy.")
             else:
-                message.reply("The following is short description and link for the tweak you requested: \n\n Title: [" + words +"](" + link + ")\n\nCategory: "+str(typet)+" \n\nDescription: " + descrip + " \n\nCreated by healdb. This bot uses http://planet-iphones.com to find its information, and therefore makes no guarantees on it's accuracy.")
+                message.reply("The following is short description and link for the tweak you requested: \n\n Title: [" + words +"](" + link + ")\n\nCategory: "+str(typet)+" \n\nDescription: " + descrip + " \n\nCreated by healdb. This bot uses http://planet-iphones.com to find its information, and therefore makes no guarantees on its accuracy.")
                 print "Found post and commented, link: " + submission.permalink
         else:
             print "not met"
