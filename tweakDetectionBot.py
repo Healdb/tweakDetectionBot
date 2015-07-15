@@ -58,6 +58,10 @@ def assembleSuggestions(packageName):
     link = "http://planet-iphones.com/cydia/feed/homepage/" + testName
     response = requests.get(link)
     feed = feedparser.parse( response.text )
+    if feed[ "items" ]==[]:
+        link = "http://planet-iphones.com/cydia/feed/nameanddescription/" + testName
+        response = requests.get(link)
+        feed = feedparser.parse( response.text )
     names=[]
     links=[]
     for item in feed[ "items" ]:
