@@ -11,7 +11,7 @@ import traceback
 
 botName=""
 password=""
-version=0.1.0
+version="0.1.1"
 #I think that this authentication method is being depreciated, it'll probably have to be changed soon
 
 try:
@@ -116,7 +116,7 @@ while True:
             try:
                 submission= message.submission
                 title = submission.title
-                if str(submission.subreddit).lower()=="jailbreak" or str(submission.subreddit).lower()=="bots4dogetesting":
+                if str(submission.subreddit).lower()=="jailbreak" or str(submission.subreddit).lower()=="tweakinfo":
                     jailbreak=True
                 else:
                     jailbreak=False
@@ -142,7 +142,7 @@ while True:
                     words=checkSpaces(pwords.lower())
                     try:
                         link, descrip,typet= getTweak(words.lower())
-                        text = "Tweak not found, the following is the closest match: \n\n _________________________ \n\n Title: [" + words +"](" + link + ")\n\nCategory: "+str(typet)+" \n\nDescription: " + descrip + " \n\n _________________________ \n\nCreated by healdb. This bot uses http://planet-iphones.com to find its information, and therefore makes no guarantees on its accuracy. [Source Code](https://github.com/Healdb/tweakDetectionBot)"
+                        text = "I assume you wanted information on: \n\n _________________________ \n\nTitle/Link: | [" + words +"](" + link + ")\n---|---\n**Category:** |**"+str(typet)+"**\n**Description:** |**" + descrip + "** \n\n _________________________ \n\nCreated by healdb. [More Information](https://www.reddit.com/r/tweakinfo/comments/3dhd98/more_information/)."
                         if private:
                             r.send_message(author.name,"Private Explanation",text)
                         else:
@@ -152,7 +152,7 @@ while True:
                         try:
                             words = assembleSuggestions(pwords.lower())
                             link, descrip,typet= getTweak(words.lower())
-                            text = "Tweak not found, the following is the closest match: \n\n _________________________ \n\n Title: [" + words +"](" + link + ")\n\nCategory: "+str(typet)+" \n\nDescription: " + descrip + " \n\n _________________________ \n\nCreated by healdb. This bot uses http://planet-iphones.com to find its information, and therefore makes no guarantees on its accuracy. [Source Code](https://github.com/Healdb/tweakDetectionBot)"
+                            text = "I assume you wanted information on: \n\n _________________________ \n\nTitle/Link: | [" + words +"](" + link + ")\n---|---\n**Category:** |**"+str(typet)+"**\n**Description:** |**" + descrip + "** \n\n _________________________ \n\nCreated by healdb. [More Information](https://www.reddit.com/r/tweakinfo/comments/3dhd98/more_information/)."
                             if private:
                                 r.send_message(author.name,"Private Explanation",text)
                             else:
@@ -160,13 +160,13 @@ while True:
                             print "Close Match"
                         except:
                             print "No Match"
-                            text ="Tweak not found, and there are no close matches. You may have spelled the name incorrectly. \n\n _________________________ \n\nCreated by healdb. This bot uses http://planet-iphones.com to find its information, and therefore makes no guarantees on its accuracy. [Source Code](https://github.com/Healdb/tweakDetectionBot)"
+                            text = "Tweak not found, and there are no close matches. You may have spelled the name incorrectly. \n\n _________________________ \n\nCreated by healdb. [More Information](https://www.reddit.com/r/tweakinfo/comments/3dhd98/more_information/)."
                             if private:
                                 r.send_message(author.name,"Private Explanation",text)
                             else:
                                 message.reply(text)
                 else:
-                    text="The following is a short description and link for the tweak you requested: \n\n _________________________ \n\n Title: [" + words +"](" + link + ")\n\nCategory: "+str(typet)+" \n\nDescription: " + descrip + " \n\n _________________________ \n\n Created by healdb. This bot uses http://planet-iphones.com to find its information, and therefore makes no guarantees on its accuracy. [Source Code](https://github.com/Healdb/tweakDetectionBot)"
+                    text="Title/Link: | [" + words +"](" + link + ")\n---|---\n**Category:** |**"+str(typet)+"**\n**Description:** |**" + descrip + "** \n\n _________________________ \n\nCreated by healdb. [More Information](https://www.reddit.com/r/tweakinfo/comments/3dhd98/more_information/)."
                     if private:
                         r.send_message(author.name,"Private Explanation",text)
                     else:
