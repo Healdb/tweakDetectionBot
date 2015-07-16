@@ -1,5 +1,7 @@
 # tweakDetectionBot
-Provides a link and a description for a specific tweak when summoned.
+Provides a link and a description for a specific tweak when summoned. 
+
+Thanks to /u/saurik for allowing me to use his API, and /u/ibbignerd for cleaning up the code and advice.
 
 <h3>Usage:</h3>
 
@@ -11,7 +13,7 @@ On /r/Jailbreak, comment anywhere saying -
 <h3>Requirements:</h3>
 PRAW
 
-feedparser
+json
 
 
 pyenchant
