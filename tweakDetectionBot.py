@@ -1,5 +1,5 @@
 import requests
-import feedparser
+import json
 import time
 import praw
 from bs4 import BeautifulSoup
@@ -11,7 +11,7 @@ import traceback
 
 botName=""
 password=""
-version=0.0.5
+version=0.1.0
 #I think that this authentication method is being depreciated, it'll probably have to be changed soon
 
 try:
@@ -39,57 +39,41 @@ def findTitle(txt):
         word1=m.group(1)
         print word1
         return word1
-def checkType(link):
-    response = requests.get(link)
-    soup = BeautifulSoup(response.text)
-    tag= soup.find(id="section")
-    try:
-        typet = str(tag.string)
-    except:
-        return False
-    return typet
 def getTweak(packageName):
-    testName = packageName.replace(" ","+")
-    link = "http://planet-iphones.com/cydia/feed/homepage/" + testName
-    response = requests.get(link)
-    feed = feedparser.parse( response.text )
-    if feed[ "items" ]==[]:
-        link = "http://planet-iphones.com/cydia/feed/nameanddescription/" + testName
-        response = requests.get(link)
-        feed = feedparser.parse( response.text )
-    for item in feed[ "items" ]:
-        title = item[ "title" ]
+    link = "https://cydia.saurik.com/api/macciti?query=" + packageName
+    response = requests.post(link)
+    json_input = response.json()
+    decoded = json.dumps(json_input)
+    decoded = json.loads(decoded)
+    for item in decoded["results"]:
+        title=item["display"]
         if title.lower() == packageName:
-            link = str(item[ "link" ])
-            response = requests.get(link)
-            soup = BeautifulSoup(response.text, "html.parser")
-            descrip= soup.find("div", { "class" : "package_description" }).text
-            link = "http://cydia.saurik.com/package/" + link.replace("http://planet-iphones.com/cydia/id/", "")
-            typet= checkType(link)
+            link = "http://cydia.saurik.com/package/" + str(item["name"])
+            typet= item["section"]
+            descrip=item["summary"]
             print link
             print descrip
             return link, descrip,typet
     return False,"error","error"
+        
 def assembleSuggestions(packageName):
-    testName = packageName.replace(" ","+")
-    link = "http://planet-iphones.com/cydia/feed/homepage/" + testName
-    response = requests.get(link)
-    feed = feedparser.parse( response.text )
-    if feed[ "items" ]==[]:
-        link = "http://planet-iphones.com/cydia/feed/nameanddescription/" + testName
-        response = requests.get(link)
-        feed = feedparser.parse( response.text )
+    link = "https://cydia.saurik.com/api/macciti?query=" + packageName
+    response = requests.post(link)
+    json_input = response.json()
+    decoded = json.dumps(json_input)
+    decoded = json.loads(decoded)
+    links= []
     names=[]
-    links=[]
-    for item in feed[ "items" ]:
-        title = item[ "title" ]
-        link = item["link"]
+    for item in decoded["results"]:
+        title=item["display"]
+        link = str(item["name"])
         names.append(title)
         links.append(link)
+    c=0
     shortest=0
     shortName=""
-    c=0
     for link in links:
+        link = "http://planet-iphones.com/cydia/id/"+link
         response = requests.post(link)
         soup = BeautifulSoup(response.text, "html.parser")
         half= soup.iframe['src']
@@ -108,18 +92,20 @@ def assembleSuggestions(packageName):
         c+=1
     return shortName
 def checkSpaces(words):
+    print "checking Spaces"
     c=1
+    link = "https://cydia.saurik.com/api/macciti?query=" + words
+    response = requests.post(link)
+    json_input = response.json()
+    decoded = json.dumps(json_input)
+    decoded = json.loads(decoded)
     for char in words:
+        words=words.replace(" ","")
         words = words[:c] + ' ' + words[c:]
-        twords= words.replace(" ","+")
-        link = "http://planet-iphones.com/cydia/feed/homepage/" + twords
-        response = requests.get(link)
-        feed = feedparser.parse( response.text )
-        if feed[ "items" ]==[]:
-            words = words.replace(" ","")
-            pass
-        else:
-            return assembleSuggestions(words)
+        for item in decoded["results"]:
+            title=item["display"]
+            if title.lower() == words:
+                return title.lower()
         c+=1
 while True:
     try:
@@ -130,7 +116,7 @@ while True:
             try:
                 submission= message.submission
                 title = submission.title
-                if str(submission.subreddit).lower()=="jailbreak":
+                if str(submission.subreddit).lower()=="jailbreak" or str(submission.subreddit).lower()=="bots4dogetesting":
                     jailbreak=True
                 else:
                     jailbreak=False
@@ -140,26 +126,31 @@ while True:
             if jailbreak:
                 print "Checking username mention for flag"
                 text = message.body
+                author =message.author
                 words = findTitle(text)
+                private=False
+                if text.lower().find("private") != -1:
+                    private=True
                 pwords=words
                 try:
                     link, descrip,typet= getTweak(words.lower())
                 except:
+                    print traceback.format_exc()
                     message.mark_as_read()
                     break
                 if link==False:
-                    words = assembleSuggestions(words)
-                    link, descrip,typet= getTweak(words.lower())
+                    words=checkSpaces(pwords.lower())
                     try:
+                        link, descrip,typet= getTweak(words.lower())
                         text = "Tweak not found, the following is the closest match: \n\n _________________________ \n\n Title: [" + words +"](" + link + ")\n\nCategory: "+str(typet)+" \n\nDescription: " + descrip + " \n\n _________________________ \n\nCreated by healdb. This bot uses http://planet-iphones.com to find its information, and therefore makes no guarantees on its accuracy. [Source Code](https://github.com/Healdb/tweakDetectionBot)"
-                        if private: #ND - 'private' is never set to true, so it will never be triggered
+                        if private:
                             r.send_message(author.name,"Private Explanation",text)
                         else:
                             message.reply(text)
                         print "Close Match"
                     except:
                         try:
-                            words=checkSpaces(pwords.lower())
+                            words = assembleSuggestions(pwords.lower())
                             link, descrip,typet= getTweak(words.lower())
                             text = "Tweak not found, the following is the closest match: \n\n _________________________ \n\n Title: [" + words +"](" + link + ")\n\nCategory: "+str(typet)+" \n\nDescription: " + descrip + " \n\n _________________________ \n\nCreated by healdb. This bot uses http://planet-iphones.com to find its information, and therefore makes no guarantees on its accuracy. [Source Code](https://github.com/Healdb/tweakDetectionBot)"
                             if private:
@@ -188,4 +179,4 @@ while True:
         time.sleep(5)
     except:
         print traceback.format_exc()
-        time.sleep(600) #ND - Why are you sleeping for 10 minutes if an error is thrown? Just have it exit if you want to see the error.
+        time.sleep(600)
