@@ -1,2 +1,2 @@
 botName = "username"
-password = "password"
+password = "pass"
