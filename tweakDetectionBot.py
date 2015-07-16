@@ -6,12 +6,29 @@ from bs4 import BeautifulSoup
 import re
 import traceback
 
-r = praw.Reddit('/r/jailbreak package description provider')
-username="USERNAME"
-password="PASSWORD"
+#r = praw.Reddit('/r/jailbreak package description provider')
+#ND - It's always good to include a version number and your username to uniqueness
+
+botName=""
+password=""
+version=0.0.5
 #I think that this authentication method is being depreciated, it'll probably have to be changed soon
-r.login(username,password)
-botName=username
+
+try:
+    import creds
+    # This is a py file in my python library which contains the
+    # bot's username and password.
+    # Now you can easily push code without worrying about showing creds
+    botName = creds.botName
+    password = creds.password
+    print "Successfully imported username and password from 'creds' library"
+except ImportError:
+    pass
+
+
+r = praw.Reddit('/r/jailbreak package description provider by Healdb. v' + version)
+r.login(botName,password)
+print "Logged into reddit"
 
 def findTitle(txt):
     txt=txt.replace("+/u/","")
@@ -106,7 +123,7 @@ def checkSpaces(words):
         c+=1
 while True:
     try:
-        print "checking"
+        print "Checking inbox"
         messages = r.get_unread('mentions')
         for message in messages:
             print message.body
@@ -121,7 +138,7 @@ while True:
                 print traceback.format_exc()
                 jailbreak=False
             if jailbreak:
-                print "checking name.."
+                print "Checking username mention for flag"
                 text = message.body
                 words = findTitle(text)
                 pwords=words
@@ -135,7 +152,7 @@ while True:
                     link, descrip,typet= getTweak(words.lower())
                     try:
                         text = "Tweak not found, the following is the closest match: \n\n _________________________ \n\n Title: [" + words +"](" + link + ")\n\nCategory: "+str(typet)+" \n\nDescription: " + descrip + " \n\n _________________________ \n\nCreated by healdb. This bot uses http://planet-iphones.com to find its information, and therefore makes no guarantees on its accuracy. [Source Code](https://github.com/Healdb/tweakDetectionBot)"
-                        if private:
+                        if private: #ND - 'private' is never set to true, so it will never be triggered
                             r.send_message(author.name,"Private Explanation",text)
                         else:
                             message.reply(text)
@@ -165,10 +182,10 @@ while True:
                         message.reply(text)
                     print "Found post and commented, link: " + submission.permalink
             else:
-                print "not met"
+                print "Username mention is not in /r/jailbreak"
             message.mark_as_read()
-        print "check done"
+        print "Done checking inbox"
         time.sleep(5)
     except:
         print traceback.format_exc()
-        time.sleep(600)
+        time.sleep(600) #ND - Why are you sleeping for 10 minutes if an error is thrown? Just have it exit if you want to see the error.
